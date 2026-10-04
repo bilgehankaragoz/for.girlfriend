@@ -1,6 +1,6 @@
 /**
  * Main Application Controller for for.girlfriend
- * Clean, fast, zero-flicker photo upload, gallery manager, and live counters
+ * Unified Top-Left Menu, Live Counters, Photo Upload & Gallery
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   // DOM Elements
   const el = {
+    btnMainMenu: document.getElementById('btn-main-menu'),
+    btnDrawerUpload: document.getElementById('btn-drawer-upload'),
+    btnDrawerGallery: document.getElementById('btn-drawer-gallery'),
     photoCountBadge: document.getElementById('photo-count-badge'),
-    btnUploadTrigger: document.getElementById('btn-upload-trigger'),
-    btnGalleryManager: document.getElementById('btn-gallery-manager'),
     btnToggleFullscreen: document.getElementById('btn-toggle-fullscreen'),
-    btnToggleDrawer: document.getElementById('btn-toggle-drawer'),
     speedChips: document.querySelectorAll('.speed-chip'),
 
     // Drawer Elements
@@ -105,8 +105,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   function refreshCollage() {
     window.collageRenderer.setPhotos(state.photos);
-    el.photoCountBadge.textContent = state.photos.length;
-    el.galleryTotalCount.textContent = state.photos.length;
+    if (el.photoCountBadge) {
+      el.photoCountBadge.textContent = state.photos.length;
+    }
+    if (el.galleryTotalCount) {
+      el.galleryTotalCount.textContent = state.photos.length;
+    }
   }
 
   // ==========================================
@@ -137,17 +141,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     const s = state.settings;
 
     // Start Date Input
-    if (s.startDate) {
+    if (s.startDate && el.inputRelationshipStart) {
       el.inputRelationshipStart.value = s.startDate.substring(0, 16);
     }
 
     // Countdown Inputs
-    el.displayTargetName.textContent = s.targetTitle || 'Özel Gün';
-    el.inputTargetTitle.value = s.targetTitle || '';
-    if (s.targetDate) {
+    if (el.displayTargetName) {
+      el.displayTargetName.textContent = s.targetTitle || 'Özel Gün';
+    }
+    if (el.inputTargetTitle) {
+      el.inputTargetTitle.value = s.targetTitle || '';
+    }
+    if (s.targetDate && el.inputTargetDate) {
       el.inputTargetDate.value = s.targetDate.substring(0, 16);
     }
-    if (s.specialEventKey) {
+    if (s.specialEventKey && el.selectSpecialEvent) {
       el.selectSpecialEvent.value = s.specialEventKey;
     }
   }
@@ -171,10 +179,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       const minutes = Math.floor((totalSec % 3600) / 60);
       const seconds = totalSec % 60;
 
-      el.elapsedDays.textContent = days.toLocaleString('tr-TR');
-      el.elapsedHours.textContent = String(hours).padStart(2, '0');
-      el.elapsedMinutes.textContent = String(minutes).padStart(2, '0');
-      el.elapsedSeconds.textContent = String(seconds).padStart(2, '0');
+      if (el.elapsedDays) el.elapsedDays.textContent = days.toLocaleString('tr-TR');
+      if (el.elapsedHours) el.elapsedHours.textContent = String(hours).padStart(2, '0');
+      if (el.elapsedMinutes) el.elapsedMinutes.textContent = String(minutes).padStart(2, '0');
+      if (el.elapsedSeconds) el.elapsedSeconds.textContent = String(seconds).padStart(2, '0');
     }
 
     update();
@@ -195,32 +203,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (isNaN(diffMs)) return;
 
       if (diffMs <= 0) {
-        el.countdownBadgeTitle.textContent = 'Günün Kutlu Olsun!';
-        el.countdownDays.textContent = '0';
-        el.countdownHours.textContent = '00';
-        el.countdownMinutes.textContent = '00';
-        el.countdownSeconds.textContent = '00';
+        if (el.countdownBadgeTitle) el.countdownBadgeTitle.textContent = 'Günün Kutlu Olsun!';
+        if (el.countdownDays) el.countdownDays.textContent = '0';
+        if (el.countdownHours) el.countdownHours.textContent = '00';
+        if (el.countdownMinutes) el.countdownMinutes.textContent = '00';
+        if (el.countdownSeconds) el.countdownSeconds.textContent = '00';
         return;
       }
 
-      el.countdownBadgeTitle.textContent = 'Geri Sayım';
+      if (el.countdownBadgeTitle) el.countdownBadgeTitle.textContent = 'Geri Sayım';
       const totalSec = Math.floor(diffMs / 1000);
       const days = Math.floor(totalSec / (3600 * 24));
       const hours = Math.floor((totalSec % (3600 * 24)) / 3600);
       const minutes = Math.floor((totalSec % 3600) / 60);
       const seconds = totalSec % 60;
 
-      el.countdownDays.textContent = days.toLocaleString('tr-TR');
-      el.countdownHours.textContent = String(hours).padStart(2, '0');
-      el.countdownMinutes.textContent = String(minutes).padStart(2, '0');
-      el.countdownSeconds.textContent = String(seconds).padStart(2, '0');
+      if (el.countdownDays) el.countdownDays.textContent = days.toLocaleString('tr-TR');
+      if (el.countdownHours) el.countdownHours.textContent = String(hours).padStart(2, '0');
+      if (el.countdownMinutes) el.countdownMinutes.textContent = String(minutes).padStart(2, '0');
+      if (el.countdownSeconds) el.countdownSeconds.textContent = String(seconds).padStart(2, '0');
     }
 
     update();
     state.countdownTimer = setInterval(update, 1000);
   }
 
-  // Handle preset special day selection
   function handlePresetEventChange(preset) {
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -241,8 +248,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         break;
 
       case 'birthday':
-        title = 'Doğum Günü';
-        // Defaults to current month + 1
+        title = 'Sevgilimin Doğum Günü';
         target = new Date(currentYear, (now.getMonth() + 1) % 12, 15, 0, 0, 0);
         if (target < now) {
           target.setFullYear(currentYear + 1);
@@ -251,21 +257,21 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       case 'valentines':
         title = '14 Şubat Sevgililer Günü';
-        target = new Date(currentYear, 1, 14, 0, 0, 0); // Feb 14
+        target = new Date(currentYear, 1, 14, 0, 0, 0);
         if (target < now) {
           target.setFullYear(currentYear + 1);
         }
         break;
 
       case 'newyear':
-        title = 'Yeni Yıl Kutlaması';
-        target = new Date(currentYear + 1, 0, 1, 0, 0, 0); // Jan 1
+        title = 'Yeni Yıl (1 Ocak)';
+        target = new Date(currentYear + 1, 0, 1, 0, 0, 0);
         break;
 
       case 'custom':
       default:
         title = el.inputTargetTitle.value || 'Özel Gün';
-        return; // Keep existing date
+        return;
     }
 
     el.inputTargetTitle.value = title;
@@ -471,10 +477,37 @@ document.addEventListener('DOMContentLoaded', async () => {
   // EVENT LISTENERS
   // ==========================================
   function setupEventListeners() {
-    // Drawer open/close
-    el.btnToggleDrawer.addEventListener('click', openDrawer);
+    // Open/Close Drawer via Top-Left Menu Button
+    el.btnMainMenu.addEventListener('click', openDrawer);
     el.drawerCloseBtn.addEventListener('click', closeDrawer);
     el.drawerBackdrop.addEventListener('click', closeDrawer);
+
+    // Open Modals from Drawer Action Stack
+    el.btnDrawerUpload.addEventListener('click', () => {
+      closeDrawer();
+      openModal(el.uploadModal);
+    });
+
+    el.btnDrawerGallery.addEventListener('click', () => {
+      closeDrawer();
+      openGalleryManager();
+    });
+
+    el.btnGalleryAddMore.addEventListener('click', () => {
+      closeModal(el.galleryModal);
+      openModal(el.uploadModal);
+    });
+
+    // Reset Photos
+    el.btnResetDefaultPhotos.addEventListener('click', async () => {
+      if (confirm('Fotoğrafları varsayılan koleksiyona sıfırlamak istiyor musunuz?')) {
+        state.photos = await window.memoryDB.resetPhotosToDefault();
+        refreshCollage();
+        if (el.galleryModal.classList.contains('active')) {
+          renderGalleryCards();
+        }
+      }
+    });
 
     // Drawer Tabs
     el.drawerTabBtns.forEach(btn => {
@@ -515,22 +548,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       el.btnSaveTargetDate.textContent = 'Uygulandı!';
       setTimeout(() => { el.btnSaveTargetDate.textContent = 'Uygula'; }, 1500);
-    });
-
-    // Modal Triggers
-    el.btnUploadTrigger.addEventListener('click', () => openModal(el.uploadModal));
-    el.btnGalleryManager.addEventListener('click', openGalleryManager);
-    el.btnGalleryAddMore.addEventListener('click', () => {
-      closeModal(el.galleryModal);
-      openModal(el.uploadModal);
-    });
-
-    el.btnResetDefaultPhotos.addEventListener('click', async () => {
-      if (confirm('Fotoğrafları varsayılan koleksiyona sıfırlamak istiyor musunuz?')) {
-        state.photos = await window.memoryDB.resetPhotosToDefault();
-        refreshCollage();
-        renderGalleryCards();
-      }
     });
 
     // Fullscreen toggle
