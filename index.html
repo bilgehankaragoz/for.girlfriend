@@ -2,29 +2,181 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=https://gf-delta-coral.vercel.app/">
-  <title>Yönlendiriliyorsunuz | for.girlfriend</title>
-  <script>
-    window.location.replace("https://gf-delta-coral.vercel.app/");
-  </script>
-  <style>
-    body {
-      background: #09090b;
-      color: #fafafa;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    a {
-      color: #3b82f6;
-      text-decoration: underline;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eda & Bilgehan | Bizim Hikayemiz</title>
+  
+  <!-- Google Fonts: Playfair Display (Zarif Başlıklar) & Plus Jakarta Sans (Modern Arayüz) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <p>Canlı siteye yönlendiriliyorsunuz... Açılmazsa <a href="https://gf-delta-coral.vercel.app/">buraya tıklayın</a>.</p>
+
+  <!-- Arka Plan Slideshow Katmanı (bg1.jpg, bg2.jpg, bg3.jpg) -->
+  <div id="slideshow-container" class="slideshow-container" aria-hidden="true">
+    <div class="slide slide-active" style="background-image: url('bg1.jpg');"></div>
+    <div class="slide" style="background-image: url('bg2.jpg');"></div>
+    <div class="slide" style="background-image: url('bg3.jpg');"></div>
+    <div class="slideshow-overlay"></div>
+  </div>
+
+  <!-- Ana Kapsayıcı (Görünümler) -->
+  <main class="app-viewport">
+
+    <!-- SAYFA 1: ANA MENÜ -->
+    <section id="view-menu" class="view-section active">
+      <div class="glass-card menu-card">
+        <div class="romantic-badge">
+          <span class="heart-pulse">❤️</span>
+          <span>Bizim Hikayemiz</span>
+        </div>
+        
+        <h1 class="main-title">Eda & Bilgehan</h1>
+        <p class="subtitle">Birlikte geçen her saniye ve geleceğe uzanan tüm anlarımız</p>
+        
+        <div class="menu-button-stack">
+          <button id="btn-to-relationship" class="glass-action-btn primary" type="button">
+            <div class="btn-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5"/></svg>
+            </div>
+            <div class="btn-text-content">
+              <span class="btn-label">İlişki Sayacı</span>
+              <span class="btn-subtext">24 Kasım 2024'ten bugüne</span>
+            </div>
+            <div class="btn-arrow">→</div>
+          </button>
+
+          <button id="btn-to-special" class="glass-action-btn" type="button">
+            <div class="btn-icon-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="btn-text-content">
+              <span class="btn-label">Özel Gün Sayacı</span>
+              <span class="btn-subtext">Yıl dönümü & doğum günleri geri sayımı</span>
+            </div>
+            <div class="btn-arrow">→</div>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAYFA 2: İLİŞKİ SAYACI (COUNT-UP) -->
+    <section id="view-relationship" class="view-section">
+      <nav class="nav-bar">
+        <button class="glass-back-btn back-to-menu-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Ana Menüye Dön</span>
+        </button>
+      </nav>
+
+      <div class="glass-card counter-card">
+        <div class="romantic-badge">
+          <span class="heart-pulse">💖</span>
+          <span>Birlikte Geçen Zaman</span>
+        </div>
+
+        <h2 class="view-title">Aşkımızın Zaman Sayacı</h2>
+        <p class="view-description">24 Kasım 2024 tarihinden beri kalplerimiz bir arada atıyor</p>
+
+        <!-- Canlı İleri Sayım Sayacı -->
+        <div class="timer-grid">
+          <div class="timer-box">
+            <span id="rel-days" class="timer-number">0</span>
+            <span class="timer-unit">Gün</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-box">
+            <span id="rel-hours" class="timer-number">00</span>
+            <span class="timer-unit">Saat</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-box">
+            <span id="rel-minutes" class="timer-number">00</span>
+            <span class="timer-unit">Dakika</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-box">
+            <span id="rel-seconds" class="timer-number">00</span>
+            <span class="timer-unit">Saniye</span>
+          </div>
+        </div>
+
+        <div class="counter-footer-quote">
+          <p>“Seninle geçen her saniye, ömrüme katılan en güzel hediye.”</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SAYFA 3: ÖZEL GÜN SAYACI (COUNTDOWN) -->
+    <section id="view-special" class="view-section">
+      <nav class="nav-bar">
+        <button class="glass-back-btn back-to-menu-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Ana Menüye Dön</span>
+        </button>
+      </nav>
+
+      <div class="glass-card counter-card">
+        <div class="romantic-badge">
+          <span class="heart-pulse">✨</span>
+          <span>Özel Günler Geri Sayımı</span>
+        </div>
+
+        <h2 class="view-title">Heyecanla Beklenen Anlar</h2>
+        
+        <!-- Özel Gün Seçim Barı / Dropdown -->
+        <div class="selection-container">
+          <label for="special-event-select" class="selection-label">Takip Edilecek Özel Günü Seçin:</label>
+          <div class="custom-select-wrapper">
+            <select id="special-event-select" class="glass-select">
+              <option value="anniversary" selected>Yıl Dönümümüz (24 Kasım)</option>
+              <option value="eda-birthday">Eda'nın Doğum Günü (18 Temmuz)</option>
+              <option value="bilgehan-birthday">Bilgehan'ın Doğum Günü (28 Mayıs)</option>
+            </select>
+            <div class="select-chevron">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <div class="target-date-display">
+          <span class="target-label">İlk Hedef Tarih:</span>
+          <span id="target-date-text" class="target-val">Hesaplanıyor...</span>
+        </div>
+
+        <!-- Canlı Geri Sayım Sayacı -->
+        <div class="timer-grid">
+          <div class="timer-box">
+            <span id="countdown-days" class="timer-number">0</span>
+            <span class="timer-unit">Gün</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-box">
+            <span id="countdown-hours" class="timer-number">00</span>
+            <span class="timer-unit">Saat</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-box">
+            <span id="countdown-minutes" class="timer-number">00</span>
+            <span class="timer-unit">Dakika</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-box">
+            <span id="countdown-seconds" class="timer-number">00</span>
+            <span class="timer-unit">Saniye</span>
+          </div>
+        </div>
+
+        <div id="countdown-status-msg" class="counter-footer-quote">
+          <p>“Kavuştuğumuz her yeni gün aşkımızı daha da güzelleştiriyor.”</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="script.js"></script>
 </body>
 </html>

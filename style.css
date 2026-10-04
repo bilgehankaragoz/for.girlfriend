@@ -1,0 +1,538 @@
+/* ==========================================================================
+   Eda & Bilgehan - Romantik & Şık Glassmorphism Tasarımı
+   ========================================================================== */
+
+:root {
+  --font-serif: 'Playfair Display', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Renk Paleti */
+  --bg-dark: #09080e;
+  --glass-bg: rgba(22, 18, 32, 0.55);
+  --glass-bg-hover: rgba(35, 28, 52, 0.72);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --glass-border-hover: rgba(255, 255, 255, 0.32);
+  --glass-shine: rgba(255, 255, 255, 0.22);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.75);
+  --text-muted: rgba(255, 255, 255, 0.52);
+
+  --accent-rose: #f43f5e;
+  --accent-pink: #fb7185;
+  --accent-gold: #f6d365;
+
+  --card-radius: 28px;
+  --box-radius: 18px;
+  --btn-radius: 16px;
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ==========================================================================
+   Arka Plan Slideshow (bg1.jpg, bg2.jpg, bg3.jpg) & Fade Geçişleri
+   ========================================================================== */
+.slideshow-container {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center center;
+  opacity: 0;
+  transform: scale(1.06);
+  transition: opacity 2s cubic-bezier(0.4, 0, 0.2, 1), transform 8s ease-out;
+  will-change: opacity, transform;
+}
+
+.slide.slide-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.slideshow-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(14, 11, 22, 0.42) 0%, rgba(6, 5, 12, 0.78) 100%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+/* ==========================================================================
+   Ana Uygulama Görünümü & Sayfa Geçişleri
+   ========================================================================== */
+.app-viewport {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 760px;
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.view-section {
+  width: 100%;
+  display: none;
+  opacity: 0;
+  transform: translateY(20px) scale(0.97);
+  transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+  flex-direction: column;
+  align-items: center;
+}
+
+.view-section.active {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ==========================================================================
+   Cam Efektli Kart (Glassmorphism)
+   ========================================================================== */
+.glass-card {
+  width: 100%;
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px) saturate(180%);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--card-radius);
+  padding: 44px 36px;
+  box-shadow: 
+    0 24px 64px -12px rgba(0, 0, 0, 0.65),
+    inset 0 1px 1px 0 var(--glass-shine);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 20%;
+  right: 20%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+}
+
+/* Üst Rozet (Badge) */
+.romantic-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 18px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+  color: var(--accent-pink);
+  margin-bottom: 20px;
+}
+
+.heart-pulse {
+  display: inline-block;
+  animation: pulse 1.8s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.22); }
+}
+
+/* Başlıklar & Metinler */
+.main-title {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.4rem);
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #ffffff 30%, #ffd4e0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 12px;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  max-width: 440px;
+  margin: 0 auto 36px auto;
+  line-height: 1.5;
+}
+
+.view-title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.view-description {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  font-weight: 300;
+  margin-bottom: 32px;
+}
+
+/* ==========================================================================
+   SAYFA 1: Ana Menü Butonları
+   ========================================================================== */
+.menu-button-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.glass-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 24px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--btn-radius);
+  color: #ffffff;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  text-align: left;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.glass-action-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateY(-3px) scale(1.015);
+  box-shadow: 0 12px 28px -6px rgba(0, 0, 0, 0.45), 0 0 20px rgba(244, 63, 94, 0.2);
+}
+
+.glass-action-btn:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.glass-action-btn.primary {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border-color: rgba(244, 63, 94, 0.38);
+}
+
+.glass-action-btn.primary:hover {
+  background: linear-gradient(135deg, rgba(244, 63, 94, 0.32) 0%, rgba(255, 255, 255, 0.14) 100%);
+  border-color: rgba(244, 63, 94, 0.6);
+}
+
+.btn-icon-wrap {
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent-pink);
+  flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+.glass-action-btn:hover .btn-icon-wrap {
+  transform: scale(1.1);
+}
+
+.btn-text-content {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.btn-label {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.2px;
+}
+
+.btn-subtext {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.btn-arrow {
+  font-size: 1.25rem;
+  color: var(--text-muted);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.glass-action-btn:hover .btn-arrow {
+  transform: translateX(5px);
+  color: #ffffff;
+}
+
+/* ==========================================================================
+   Üst Gezinme & "Ana Menüye Dön" Butonu
+   ========================================================================== */
+.nav-bar {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 16px;
+}
+
+.glass-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  background: rgba(22, 18, 32, 0.5);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.glass-back-btn:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: translateX(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+/* ==========================================================================
+   Sayaç Ekranı (Grid & Cam Kutucuklar)
+   ========================================================================== */
+.timer-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px 0 32px 0;
+  flex-wrap: wrap;
+}
+
+.timer-box {
+  flex: 1;
+  min-width: 100px;
+  max-width: 135px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: var(--box-radius);
+  padding: 22px 12px 18px 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 8px 24px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, border-color 0.25s ease;
+}
+
+.timer-box:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.timer-number {
+  font-family: var(--font-serif);
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.1;
+  background: linear-gradient(180deg, #ffffff 40%, #ffdce5 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-variant-numeric: tabular-nums;
+  margin-bottom: 4px;
+}
+
+.timer-unit {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-pink);
+}
+
+.timer-separator {
+  font-family: var(--font-serif);
+  font-size: 2rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: -12px;
+  user-select: none;
+}
+
+.counter-footer-quote {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--text-secondary);
+  font-size: 1.05rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  padding-top: 24px;
+  margin-top: 10px;
+}
+
+/* ==========================================================================
+   SAYFA 3: Özel Gün Seçim Barı (Açılır Menü / Dropdown)
+   ========================================================================== */
+.selection-container {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto 24px auto;
+  text-align: left;
+}
+
+.selection-label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.custom-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.glass-select {
+  width: 100%;
+  padding: 16px 44px 16px 20px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--btn-radius);
+  color: #ffffff;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.glass-select:focus, .glass-select:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--accent-pink);
+  box-shadow: 0 0 16px rgba(251, 113, 133, 0.25);
+}
+
+.glass-select option {
+  background-color: #1a1528;
+  color: #ffffff;
+  padding: 12px;
+}
+
+.select-chevron {
+  position: absolute;
+  right: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  transition: color 0.3s ease;
+}
+
+.glass-select:focus ~ .select-chevron {
+  color: var(--accent-pink);
+}
+
+.target-date-display {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 6px 18px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.target-val {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+/* ==========================================================================
+   Mobil ve Duyarlı Tasarım (Responsive)
+   ========================================================================== */
+@media (max-width: 640px) {
+  .app-viewport {
+    padding: 16px 12px;
+  }
+
+  .glass-card {
+    padding: 32px 20px;
+    border-radius: 22px;
+  }
+
+  .timer-grid {
+    gap: 8px;
+  }
+
+  .timer-box {
+    min-width: 72px;
+    padding: 16px 6px 12px 6px;
+  }
+
+  .timer-number {
+    font-size: 2rem;
+  }
+
+  .timer-unit {
+    font-size: 0.7rem;
+    letter-spacing: 1px;
+  }
+
+  .timer-separator {
+    display: none;
+  }
+
+  .btn-label {
+    font-size: 1.05rem;
+  }
+}
