@@ -1,6 +1,6 @@
 /**
  * Main Application Controller for for.girlfriend
- * Orchestrates Collage, Audio, Counter, Uploads, Settings and Interactions
+ * Clean, fast, zero-flicker photo upload, gallery manager, and speed controls
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,41 +11,20 @@ document.addEventListener('DOMContentLoaded', async () => {
   let state = {
     photos: [],
     settings: {},
-    uploadQueue: [],
-    counterTimer: null,
-    isFocusMode: false
+    uploadQueue: []
   };
 
   // DOM Elements
   const el = {
-    // Nav & Badges
-    navCoupleNames: document.getElementById('nav-couple-names'),
     photoCountBadge: document.getElementById('photo-count-badge'),
-    btnToggleMusic: document.getElementById('btn-toggle-music'),
     btnUploadTrigger: document.getElementById('btn-upload-trigger'),
     btnGalleryManager: document.getElementById('btn-gallery-manager'),
-    btnOpenSettings: document.getElementById('btn-open-settings'),
-    btnToggleFocus: document.getElementById('btn-toggle-focus'),
-    btnExitFocus: document.getElementById('btn-exit-focus'),
-
-    // Hero
-    displayCoupleNames: document.getElementById('display-couple-names'),
-    displayRomanticQuote: document.getElementById('display-romantic-quote'),
-    displayStartDate: document.getElementById('display-start-date'),
-    timeDays: document.getElementById('time-days'),
-    timeHours: document.getElementById('time-hours'),
-    timeMinutes: document.getElementById('time-minutes'),
-    timeSeconds: document.getElementById('time-seconds'),
-    btnOpenLetter: document.getElementById('btn-open-letter'),
-    btnQuickUpload: document.getElementById('btn-quick-upload'),
-    filterDropdown: document.getElementById('filter-dropdown'),
+    btnToggleFullscreen: document.getElementById('btn-toggle-fullscreen'),
     speedChips: document.querySelectorAll('.speed-chip'),
 
     // Modals
     uploadModal: document.getElementById('upload-modal'),
     galleryModal: document.getElementById('gallery-modal'),
-    letterModal: document.getElementById('letter-modal'),
-    settingsModal: document.getElementById('settings-modal'),
     lightboxModal: document.getElementById('lightbox-modal'),
 
     // Upload Elements
@@ -64,61 +43,29 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnGalleryAddMore: document.getElementById('btn-gallery-add-more'),
     btnResetDefaultPhotos: document.getElementById('btn-reset-default-photos'),
 
-    // Letter Elements
-    letterTitle: document.getElementById('letter-title'),
-    letterBody: document.getElementById('letter-body'),
-    letterSignatureDisplay: document.getElementById('letter-signature-display'),
-    letterDateDisplay: document.getElementById('letter-date-display'),
-    btnEditLetter: document.getElementById('btn-edit-letter'),
-
-    // Settings Form Elements
-    settingsForm: document.getElementById('settings-form'),
-    inputPartnerName: document.getElementById('input-partner-name'),
-    inputGirlfriendName: document.getElementById('input-girlfriend-name'),
-    inputAnniversaryDate: document.getElementById('input-anniversary-date'),
-    inputCustomQuote: document.getElementById('input-custom-quote'),
-    inputLetterText: document.getElementById('input-letter-text'),
-    inputLetterSignature: document.getElementById('input-letter-signature'),
-    btnSaveSettings: document.getElementById('btn-save-settings'),
-
     // Lightbox
     lightboxImg: document.getElementById('lightbox-img'),
     lightboxDate: document.getElementById('lightbox-date'),
-    lightboxCloseBtn: document.getElementById('lightbox-close-btn'),
-    lightboxHeartBtn: document.getElementById('lightbox-heart-btn'),
-
-    // Particles
-    particlesContainer: document.getElementById('particles-container')
+    lightboxCloseBtn: document.getElementById('lightbox-close-btn')
   };
 
   // ==========================================
-  // INITIALIZATION & DATA LOADING
+  // INITIALIZATION
   // ==========================================
   async function initApp() {
     state.settings = await window.memoryDB.getSettings();
     state.photos = await window.memoryDB.getAllPhotos();
 
-    applySettingsToUI();
     applySpeed(state.settings.speed || 'normal');
-    applyFilter(state.settings.filter || 'romantic');
 
     // Setup Collage
     window.collageRenderer.setOnPhotoClick(openLightbox);
     refreshCollage();
 
-    // Start Live Anniversary Counter
-    startCounter();
-
-    // Floating heart ambient particles
-    startAmbientParticles();
-
     // Event Listeners
     setupEventListeners();
   }
 
-  // ==========================================
-  // COLLAGE & GALLERY REFRESH
-  // ==========================================
   function refreshCollage() {
     window.collageRenderer.setPhotos(state.photos);
     el.photoCountBadge.textContent = state.photos.length;
@@ -126,76 +73,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // SETTINGS & UI BINDING
-  // ==========================================
-  function applySettingsToUI() {
-    const s = state.settings;
-    const coupleText = `${s.partnerName} & ${s.girlfriendName}`;
-
-    el.navCoupleNames.textContent = coupleText;
-    el.displayCoupleNames.textContent = coupleText;
-    el.displayRomanticQuote.textContent = `"${s.romanticQuote}"`;
-
-    // Form inputs
-    el.inputPartnerName.value = s.partnerName || '';
-    el.inputGirlfriendName.value = s.girlfriendName || '';
-    el.inputAnniversaryDate.value = s.startDate ? s.startDate.substring(0, 16) : '';
-    el.inputCustomQuote.value = s.romanticQuote || '';
-    el.inputLetterText.value = s.letterBody || '';
-    el.inputLetterSignature.value = s.letterSignature || '';
-
-    // Letter
-    el.letterTitle.textContent = `${s.girlfriendName}'e Sevgilerimle...`;
-    el.letterSignatureDisplay.textContent = s.letterSignature || coupleText;
-    
-    // Format letter paragraphs
-    const paragraphs = (s.letterBody || '').split('\n').filter(p => p.trim());
-    el.letterBody.innerHTML = paragraphs.map(p => `<p>${escapeHTML(p)}</p>`).join('');
-
-    // Format start date label
-    try {
-      const d = new Date(s.startDate);
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      el.displayStartDate.textContent = d.toLocaleDateString('tr-TR', options);
-    } catch (e) {
-      el.displayStartDate.textContent = s.startDate;
-    }
-  }
-
-  // ==========================================
-  // REAL-TIME ANNIVERSARY COUNTER
-  // ==========================================
-  function startCounter() {
-    if (state.counterTimer) clearInterval(state.counterTimer);
-
-    function update() {
-      const startDate = new Date(state.settings.startDate);
-      const now = new Date();
-      let diffMs = now - startDate;
-
-      if (diffMs < 0) {
-        // If date is in the future
-        diffMs = 0;
-      }
-
-      const totalSeconds = Math.floor(diffMs / 1000);
-      const days = Math.floor(totalSeconds / (3600 * 24));
-      const hours = Math.floor((totalSeconds % (3600 * 24)) / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-
-      el.timeDays.textContent = days.toLocaleString();
-      el.timeHours.textContent = String(hours).padStart(2, '0');
-      el.timeMinutes.textContent = String(minutes).padStart(2, '0');
-      el.timeSeconds.textContent = String(seconds).padStart(2, '0');
-    }
-
-    update();
-    state.counterTimer = setInterval(update, 1000);
-  }
-
-  // ==========================================
-  // SPEED & FILTER CONTROLS
+  // SPEED CONTROL
   // ==========================================
   function applySpeed(speed) {
     const multipliers = { slow: 0.55, normal: 1, fast: 1.85 };
@@ -210,57 +88,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.memoryDB.saveSettings(state.settings);
   }
 
-  function applyFilter(filterName) {
-    document.body.className = document.body.className.replace(/\bfilter-\w+/g, '');
-    document.body.classList.add(`filter-${filterName}`);
-    el.filterDropdown.value = filterName;
-
-    state.settings.filter = filterName;
-    window.memoryDB.saveSettings(state.settings);
-  }
-
-  // ==========================================
-  // FLOATING PARTICLES (HEARTS)
-  // ==========================================
-  function startAmbientParticles() {
-    const heartIcons = ['fa-heart', 'fa-sparkle'];
-    
-    function spawnHeart() {
-      if (document.hidden) return;
-      const heart = document.createElement('i');
-      heart.className = `fa-solid fa-heart floating-heart`;
-      
-      const left = Math.random() * 100;
-      const size = 10 + Math.random() * 16;
-      const duration = 6 + Math.random() * 6;
-      const delay = Math.random() * 2;
-
-      heart.style.left = `${left}vw`;
-      heart.style.fontSize = `${size}px`;
-      heart.style.animationDuration = `${duration}s`;
-      heart.style.animationDelay = `${delay}s`;
-
-      el.particlesContainer.appendChild(heart);
-
-      setTimeout(() => {
-        heart.remove();
-      }, (duration + delay) * 1000);
-    }
-
-    // Initial batch
-    for (let i = 0; i < 7; i++) {
-      spawnHeart();
-    }
-    // Periodic spawn
-    setInterval(spawnHeart, 2200);
-  }
-
   // ==========================================
   // LIGHTBOX VIEWER
   // ==========================================
   function openLightbox(photo) {
     el.lightboxImg.src = photo.url;
-    el.lightboxDate.textContent = photo.caption || photo.date || 'Sonsuz Anımız';
+    el.lightboxDate.textContent = photo.caption || '';
     el.lightboxModal.classList.add('active');
     el.lightboxModal.setAttribute('aria-hidden', 'false');
   }
@@ -291,7 +124,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
-  // Close modals on backdrop click
   document.querySelectorAll('.modal-backdrop').forEach(modal => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeModal(modal);
@@ -299,7 +131,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 
   // ==========================================
-  // PHOTO UPLOAD HANDLING (FILES & DRAG-AND-DROP)
+  // PHOTO UPLOADS
   // ==========================================
   function handleFiles(files) {
     const validFiles = Array.from(files).filter(file => file.type.startsWith('image/'));
@@ -311,8 +143,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const item = {
           id: 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
           url: e.target.result,
-          caption: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Aşk Hatıramız',
-          date: new Date().toLocaleDateString('tr-TR')
+          caption: file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ') || 'Fotoğraf'
         };
         state.uploadQueue.push(item);
         renderUploadQueue();
@@ -360,18 +191,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function confirmUploadQueue() {
     if (state.uploadQueue.length === 0) return;
 
-    // Save to Database
     await window.memoryDB.addPhotos(state.uploadQueue);
     state.photos = await window.memoryDB.getAllPhotos();
     refreshCollage();
 
-    // Reset queue and close modal
     state.uploadQueue = [];
     renderUploadQueue();
     closeModal(el.uploadModal);
-
-    // Cute celebration effect
-    createHeartConfetti();
   }
 
   function addUrlPhoto() {
@@ -381,8 +207,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const item = {
       id: 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6),
       url: url,
-      caption: 'Özel Anımız ✨',
-      date: new Date().toLocaleDateString('tr-TR')
+      caption: 'Eklenen Fotoğraf'
     };
 
     state.uploadQueue.push(item);
@@ -408,26 +233,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       const img = document.createElement('img');
       img.src = photo.url;
-      img.alt = photo.caption || 'Hatıra';
+      img.alt = photo.caption || 'Fotoğraf';
 
       const actions = document.createElement('div');
       actions.className = 'gallery-item-actions';
 
-      // View Button
       const viewBtn = document.createElement('button');
       viewBtn.className = 'gallery-btn-action';
       viewBtn.innerHTML = '<i class="fa-solid fa-eye"></i>';
       viewBtn.title = 'Büyüt';
       viewBtn.onclick = () => openLightbox(photo);
 
-      // Delete Button
       const delBtn = document.createElement('button');
       delBtn.className = 'gallery-btn-action delete';
       delBtn.innerHTML = '<i class="fa-solid fa-trash-can"></i>';
-      delBtn.title = 'Kolajdan Sil';
+      delBtn.title = 'Sil';
       delBtn.onclick = async () => {
         if (state.photos.length <= 1) {
-          alert('Kolajda en az bir fotoğraf bulunmalıdır!');
+          alert('Kolajda en az bir fotoğraf bulunmalıdır.');
           return;
         }
         await window.memoryDB.deletePhoto(photo.id);
@@ -445,45 +268,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
 
   // ==========================================
-  // CELEBRATION CONFETTI
-  // ==========================================
-  function createHeartConfetti() {
-    for (let i = 0; i < 20; i++) {
-      const heart = document.createElement('i');
-      heart.className = 'fa-solid fa-heart floating-heart';
-      heart.style.left = `${30 + Math.random() * 40}vw`;
-      heart.style.fontSize = `${18 + Math.random() * 20}px`;
-      heart.style.color = '#f43f5e';
-      heart.style.animationDuration = '3.5s';
-      heart.style.animationDelay = `${Math.random() * 0.4}s`;
-      el.particlesContainer.appendChild(heart);
-
-      setTimeout(() => heart.remove(), 4000);
-    }
-  }
-
-  // Escape HTML helper
-  function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
-      tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-    );
-  }
-
-  // ==========================================
-  // EVENT LISTENERS SETUP
+  // EVENT LISTENERS
   // ==========================================
   function setupEventListeners() {
-    // Music Toggle
-    el.btnToggleMusic.addEventListener('click', () => {
-      const playing = window.romanticAudio.toggle();
-      el.btnToggleMusic.classList.toggle('playing', playing);
-      const text = el.btnToggleMusic.querySelector('.btn-text');
-      if (text) text.textContent = playing ? 'Çalıyor...' : 'Melodi';
-    });
-
-    // Modals Openers
     el.btnUploadTrigger.addEventListener('click', () => openModal(el.uploadModal));
-    el.btnQuickUpload.addEventListener('click', () => openModal(el.uploadModal));
     el.btnGalleryManager.addEventListener('click', openGalleryManager);
     el.btnGalleryAddMore.addEventListener('click', () => {
       closeModal(el.galleryModal);
@@ -491,52 +279,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     el.btnResetDefaultPhotos.addEventListener('click', async () => {
-      if (confirm('Fotoğrafları varsayılan romantik koleksiyona sıfırlamak istiyor musunuz?')) {
+      if (confirm('Fotoğrafları varsayılan koleksiyona sıfırlamak istiyor musunuz?')) {
         state.photos = await window.memoryDB.resetPhotosToDefault();
         refreshCollage();
         renderGalleryCards();
       }
     });
 
-    el.btnOpenLetter.addEventListener('click', () => openModal(el.letterModal));
-    el.btnEditLetter.addEventListener('click', () => {
-      closeModal(el.letterModal);
-      openModal(el.settingsModal);
-    });
-
-    el.btnOpenSettings.addEventListener('click', () => openModal(el.settingsModal));
-
-    // Focus / Zen Mode (Fullscreen Infinite Collage View)
-    function toggleFocusMode() {
-      state.isFocusMode = !state.isFocusMode;
-      document.body.classList.toggle('focus-mode', state.isFocusMode);
-    }
-
-    el.btnToggleFocus.addEventListener('click', toggleFocusMode);
-    el.btnExitFocus.addEventListener('click', toggleFocusMode);
-
-    // ESC to exit Focus Mode or Lightbox
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (state.isFocusMode) toggleFocusMode();
-        closeLightbox();
-        closeModal(el.uploadModal);
-        closeModal(el.galleryModal);
-        closeModal(el.letterModal);
-        closeModal(el.settingsModal);
+    // Fullscreen toggle
+    el.btnToggleFullscreen.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
       }
     });
 
-    // Speed Chips
+    // Escape closes modals
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        closeLightbox();
+        closeModal(el.uploadModal);
+        closeModal(el.galleryModal);
+      }
+    });
+
+    // Speed chips
     el.speedChips.forEach(chip => {
       chip.addEventListener('click', () => {
         applySpeed(chip.dataset.speed);
       });
-    });
-
-    // Color Filters
-    el.filterDropdown.addEventListener('change', (e) => {
-      applyFilter(e.target.value);
     });
 
     // Dropzone & File Pick
@@ -572,40 +344,13 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // Confirm Upload Queue
+    // Confirm Upload
     el.btnConfirmUpload.addEventListener('click', confirmUploadQueue);
 
-    // Save Settings
-    el.btnSaveSettings.addEventListener('click', async (e) => {
-      e.preventDefault();
-      const updated = {
-        ...state.settings,
-        partnerName: el.inputPartnerName.value.trim() || 'Ben',
-        girlfriendName: el.inputGirlfriendName.value.trim() || 'Sevgilim',
-        startDate: el.inputAnniversaryDate.value || state.settings.startDate,
-        romanticQuote: el.inputCustomQuote.value.trim() || state.settings.romanticQuote,
-        letterBody: el.inputLetterText.value || state.settings.letterBody,
-        letterSignature: el.inputLetterSignature.value.trim() || state.settings.letterSignature
-      };
-
-      await window.memoryDB.saveSettings(updated);
-      state.settings = updated;
-      applySettingsToUI();
-      startCounter();
-      closeModal(el.settingsModal);
-      createHeartConfetti();
-    });
-
-    // Lightbox Controls
+    // Lightbox Close
     el.lightboxCloseBtn.addEventListener('click', closeLightbox);
     el.lightboxModal.addEventListener('click', (e) => {
       if (e.target === el.lightboxModal) closeLightbox();
-    });
-
-    el.lightboxHeartBtn.addEventListener('click', () => {
-      createHeartConfetti();
-      el.lightboxHeartBtn.style.transform = 'scale(1.4)';
-      setTimeout(() => el.lightboxHeartBtn.style.transform = 'scale(1)', 300);
     });
   }
 
