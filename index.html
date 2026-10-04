@@ -6,7 +6,7 @@
   <title>Fotoğraf Kolajı | for.girlfriend</title>
   <meta name="description" content="Arka planda kesintisiz dikey akan fotoğraf kolajı ve fotoğraf yöneticisi.">
   
-  <!-- Modern Crisp Typography: Inter & Plus Jakarta Sans -->
+  <!-- Modern Crisp Typography: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -48,6 +48,11 @@
         <button class="speed-chip" data-speed="fast">Hızlı</button>
       </div>
 
+      <button id="btn-toggle-drawer" class="action-btn" title="Sayaçlar ve Özel Günler">
+        <i class="fa-solid fa-clock"></i>
+        <span>Sayaçlar</span>
+      </button>
+
       <button id="btn-upload-trigger" class="action-btn primary" title="Yeni Fotoğraf Yükle">
         <i class="fa-solid fa-plus"></i>
         <span>Fotoğraf Ekle</span>
@@ -63,6 +68,126 @@
       </button>
     </div>
   </header>
+
+  <!-- ==============================================
+       AÇILIR MENÜ (DRAWER): İLİŞKİ SAYACI & ÖZEL GÜNLER GERİ SAYIMI
+       ============================================== -->
+  <div class="drawer-backdrop" id="drawer-backdrop"></div>
+  <aside class="side-drawer" id="side-drawer" aria-hidden="true">
+    <div class="drawer-header">
+      <div class="drawer-title-wrap">
+        <i class="fa-solid fa-calendar-days"></i>
+        <h3>Sayaçlar & Özel Günler</h3>
+      </div>
+      <button class="drawer-close-btn" id="drawer-close-btn" aria-label="Kapat">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Sekmeler (Tabs) -->
+    <div class="drawer-tabs">
+      <button class="drawer-tab-btn active" data-tab="tab-elapsed">
+        <i class="fa-solid fa-heart"></i>
+        <span>İlişki Sayacı</span>
+      </button>
+      <button class="drawer-tab-btn" data-tab="tab-countdown">
+        <i class="fa-solid fa-hourglass-half"></i>
+        <span>Özel Günler</span>
+      </button>
+    </div>
+
+    <div class="drawer-body">
+      <!-- SEKME 1: İLİŞKİ SAYACI (GEÇEN ZAMAN) -->
+      <div class="drawer-tab-pane active" id="tab-elapsed">
+        <div class="counter-card">
+          <span class="counter-badge">Birlikte Geçen Süre</span>
+          <div class="counter-display-grid">
+            <div class="count-box">
+              <span class="count-value" id="elapsed-days">0</span>
+              <span class="count-label">Gün</span>
+            </div>
+            <div class="count-box">
+              <span class="count-value" id="elapsed-hours">00</span>
+              <span class="count-label">Saat</span>
+            </div>
+            <div class="count-box">
+              <span class="count-value" id="elapsed-minutes">00</span>
+              <span class="count-label">Dakika</span>
+            </div>
+            <div class="count-box">
+              <span class="count-value" id="elapsed-seconds">00</span>
+              <span class="count-label">Saniye</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="drawer-section">
+          <label for="input-relationship-start" class="section-label">
+            <i class="fa-solid fa-calendar-check"></i> Başlangıç Tarihi:
+          </label>
+          <div class="date-input-wrap">
+            <input type="datetime-local" id="input-relationship-start" class="clean-input">
+            <button id="btn-save-start-date" class="btn-primary-sm">Kaydet</button>
+          </div>
+          <small class="helper-text">Sayacınız bu tarihten itibaren geçen zamanı anlık olarak hesaplar.</small>
+        </div>
+      </div>
+
+      <!-- SEKME 2: ÖZEL GÜNLER & GERİ SAYIM -->
+      <div class="drawer-tab-pane" id="tab-countdown">
+        <div class="counter-card countdown-theme">
+          <span class="counter-badge" id="countdown-badge-title">Geri Sayım</span>
+          <h4 class="countdown-target-name" id="display-target-name">Yıldönümümüz</h4>
+          <div class="counter-display-grid">
+            <div class="count-box">
+              <span class="count-value" id="countdown-days">0</span>
+              <span class="count-label">Gün</span>
+            </div>
+            <div class="count-box">
+              <span class="count-value" id="countdown-hours">00</span>
+              <span class="count-label">Saat</span>
+            </div>
+            <div class="count-box">
+              <span class="count-value" id="countdown-minutes">00</span>
+              <span class="count-label">Dakika</span>
+            </div>
+            <div class="count-box">
+              <span class="count-value" id="countdown-seconds">00</span>
+              <span class="count-label">Saniye</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Özel Gün Seçimi & Tarihi -->
+        <div class="drawer-section">
+          <label for="select-special-event" class="section-label">
+            <i class="fa-solid fa-list-check"></i> Hazır Özel Günler:
+          </label>
+          <select id="select-special-event" class="clean-select">
+            <option value="anniversary">Yıldönümümüz</option>
+            <option value="birthday">Sevgilimin Doğum Günü</option>
+            <option value="valentines">14 Şubat Sevgililer Günü</option>
+            <option value="newyear">Yılbaşı (1 Ocak)</option>
+            <option value="custom">Özel Bir Gün Belirle...</option>
+          </select>
+        </div>
+
+        <div class="drawer-section">
+          <label for="input-target-title" class="section-label">Özel Günün Adı:</label>
+          <input type="text" id="input-target-title" class="clean-input" placeholder="Örn: Yıldönümümüz">
+        </div>
+
+        <div class="drawer-section">
+          <label for="input-target-date" class="section-label">Hedef Tarih & Saat:</label>
+          <div class="date-input-wrap">
+            <input type="datetime-local" id="input-target-date" class="clean-input">
+            <button id="btn-save-target-date" class="btn-primary-sm">Uygula</button>
+          </div>
+          <small class="helper-text">Seçilen gün için kalan süre saniye saniye geri sayılır.</small>
+        </div>
+      </div>
+    </div>
+  </aside>
 
   <!-- ==============================================
        MODAL: FOTOĞRAF YÜKLEME (Drag & Drop + URL + Dosya Seçici)

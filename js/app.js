@@ -1,6 +1,6 @@
 /**
  * Main Application Controller for for.girlfriend
- * Clean, fast, zero-flicker photo upload, gallery manager, and speed controls
+ * Clean, fast, zero-flicker photo upload, gallery manager, and live counters
  */
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -11,7 +11,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   let state = {
     photos: [],
     settings: {},
-    uploadQueue: []
+    uploadQueue: [],
+    elapsedTimer: null,
+    countdownTimer: null
   };
 
   // DOM Elements
@@ -20,7 +22,35 @@ document.addEventListener('DOMContentLoaded', async () => {
     btnUploadTrigger: document.getElementById('btn-upload-trigger'),
     btnGalleryManager: document.getElementById('btn-gallery-manager'),
     btnToggleFullscreen: document.getElementById('btn-toggle-fullscreen'),
+    btnToggleDrawer: document.getElementById('btn-toggle-drawer'),
     speedChips: document.querySelectorAll('.speed-chip'),
+
+    // Drawer Elements
+    sideDrawer: document.getElementById('side-drawer'),
+    drawerBackdrop: document.getElementById('drawer-backdrop'),
+    drawerCloseBtn: document.getElementById('drawer-close-btn'),
+    drawerTabBtns: document.querySelectorAll('.drawer-tab-btn'),
+    drawerTabPanes: document.querySelectorAll('.drawer-tab-pane'),
+
+    // Elapsed Counter Elements
+    elapsedDays: document.getElementById('elapsed-days'),
+    elapsedHours: document.getElementById('elapsed-hours'),
+    elapsedMinutes: document.getElementById('elapsed-minutes'),
+    elapsedSeconds: document.getElementById('elapsed-seconds'),
+    inputRelationshipStart: document.getElementById('input-relationship-start'),
+    btnSaveStartDate: document.getElementById('btn-save-start-date'),
+
+    // Countdown Elements
+    countdownDays: document.getElementById('countdown-days'),
+    countdownHours: document.getElementById('countdown-hours'),
+    countdownMinutes: document.getElementById('countdown-minutes'),
+    countdownSeconds: document.getElementById('countdown-seconds'),
+    displayTargetName: document.getElementById('display-target-name'),
+    countdownBadgeTitle: document.getElementById('countdown-badge-title'),
+    selectSpecialEvent: document.getElementById('select-special-event'),
+    inputTargetTitle: document.getElementById('input-target-title'),
+    inputTargetDate: document.getElementById('input-target-date'),
+    btnSaveTargetDate: document.getElementById('btn-save-target-date'),
 
     // Modals
     uploadModal: document.getElementById('upload-modal'),
@@ -58,6 +88,13 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     applySpeed(state.settings.speed || 'normal');
 
+    // Populate Drawer Inputs
+    setupDrawerData();
+
+    // Start Live Timers
+    startElapsedTimer();
+    startCountdownTimer();
+
     // Setup Collage
     window.collageRenderer.setOnPhotoClick(openLightbox);
     refreshCollage();
@@ -70,6 +107,169 @@ document.addEventListener('DOMContentLoaded', async () => {
     window.collageRenderer.setPhotos(state.photos);
     el.photoCountBadge.textContent = state.photos.length;
     el.galleryTotalCount.textContent = state.photos.length;
+  }
+
+  // ==========================================
+  // DRAWER & TAB MANAGEMENT
+  // ==========================================
+  function openDrawer() {
+    el.sideDrawer.classList.add('active');
+    el.drawerBackdrop.classList.add('active');
+    el.sideDrawer.setAttribute('aria-hidden', 'false');
+  }
+
+  function closeDrawer() {
+    el.sideDrawer.classList.remove('active');
+    el.drawerBackdrop.classList.remove('active');
+    el.sideDrawer.setAttribute('aria-hidden', 'true');
+  }
+
+  function switchDrawerTab(targetTabId) {
+    el.drawerTabBtns.forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === targetTabId);
+    });
+    el.drawerTabPanes.forEach(pane => {
+      pane.classList.toggle('active', pane.id === targetTabId);
+    });
+  }
+
+  function setupDrawerData() {
+    const s = state.settings;
+
+    // Start Date Input
+    if (s.startDate) {
+      el.inputRelationshipStart.value = s.startDate.substring(0, 16);
+    }
+
+    // Countdown Inputs
+    el.displayTargetName.textContent = s.targetTitle || 'Özel Gün';
+    el.inputTargetTitle.value = s.targetTitle || '';
+    if (s.targetDate) {
+      el.inputTargetDate.value = s.targetDate.substring(0, 16);
+    }
+    if (s.specialEventKey) {
+      el.selectSpecialEvent.value = s.specialEventKey;
+    }
+  }
+
+  // ==========================================
+  // LIVE ELAPSED TIMER (İLİŞKİ SAYACI)
+  // ==========================================
+  function startElapsedTimer() {
+    if (state.elapsedTimer) clearInterval(state.elapsedTimer);
+
+    function update() {
+      const start = new Date(state.settings.startDate);
+      const now = new Date();
+      let diffMs = now - start;
+
+      if (isNaN(diffMs) || diffMs < 0) diffMs = 0;
+
+      const totalSec = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSec / (3600 * 24));
+      const hours = Math.floor((totalSec % (3600 * 24)) / 3600);
+      const minutes = Math.floor((totalSec % 3600) / 60);
+      const seconds = totalSec % 60;
+
+      el.elapsedDays.textContent = days.toLocaleString('tr-TR');
+      el.elapsedHours.textContent = String(hours).padStart(2, '0');
+      el.elapsedMinutes.textContent = String(minutes).padStart(2, '0');
+      el.elapsedSeconds.textContent = String(seconds).padStart(2, '0');
+    }
+
+    update();
+    state.elapsedTimer = setInterval(update, 1000);
+  }
+
+  // ==========================================
+  // LIVE COUNTDOWN TIMER (ÖZEL GÜNLER GERİ SAYIMI)
+  // ==========================================
+  function startCountdownTimer() {
+    if (state.countdownTimer) clearInterval(state.countdownTimer);
+
+    function update() {
+      const target = new Date(state.settings.targetDate);
+      const now = new Date();
+      let diffMs = target - now;
+
+      if (isNaN(diffMs)) return;
+
+      if (diffMs <= 0) {
+        el.countdownBadgeTitle.textContent = 'Günün Kutlu Olsun!';
+        el.countdownDays.textContent = '0';
+        el.countdownHours.textContent = '00';
+        el.countdownMinutes.textContent = '00';
+        el.countdownSeconds.textContent = '00';
+        return;
+      }
+
+      el.countdownBadgeTitle.textContent = 'Geri Sayım';
+      const totalSec = Math.floor(diffMs / 1000);
+      const days = Math.floor(totalSec / (3600 * 24));
+      const hours = Math.floor((totalSec % (3600 * 24)) / 3600);
+      const minutes = Math.floor((totalSec % 3600) / 60);
+      const seconds = totalSec % 60;
+
+      el.countdownDays.textContent = days.toLocaleString('tr-TR');
+      el.countdownHours.textContent = String(hours).padStart(2, '0');
+      el.countdownMinutes.textContent = String(minutes).padStart(2, '0');
+      el.countdownSeconds.textContent = String(seconds).padStart(2, '0');
+    }
+
+    update();
+    state.countdownTimer = setInterval(update, 1000);
+  }
+
+  // Handle preset special day selection
+  function handlePresetEventChange(preset) {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    let title = '';
+    let target = new Date();
+
+    switch (preset) {
+      case 'anniversary':
+        title = 'Yıldönümümüz';
+        const start = new Date(state.settings.startDate);
+        const annMonth = start.getMonth();
+        const annDay = start.getDate();
+        target = new Date(currentYear, annMonth, annDay, 0, 0, 0);
+        if (target < now) {
+          target.setFullYear(currentYear + 1);
+        }
+        break;
+
+      case 'birthday':
+        title = 'Doğum Günü';
+        // Defaults to current month + 1
+        target = new Date(currentYear, (now.getMonth() + 1) % 12, 15, 0, 0, 0);
+        if (target < now) {
+          target.setFullYear(currentYear + 1);
+        }
+        break;
+
+      case 'valentines':
+        title = '14 Şubat Sevgililer Günü';
+        target = new Date(currentYear, 1, 14, 0, 0, 0); // Feb 14
+        if (target < now) {
+          target.setFullYear(currentYear + 1);
+        }
+        break;
+
+      case 'newyear':
+        title = 'Yeni Yıl Kutlaması';
+        target = new Date(currentYear + 1, 0, 1, 0, 0, 0); // Jan 1
+        break;
+
+      case 'custom':
+      default:
+        title = el.inputTargetTitle.value || 'Özel Gün';
+        return; // Keep existing date
+    }
+
+    el.inputTargetTitle.value = title;
+    el.inputTargetDate.value = target.toISOString().substring(0, 16);
   }
 
   // ==========================================
@@ -271,6 +471,53 @@ document.addEventListener('DOMContentLoaded', async () => {
   // EVENT LISTENERS
   // ==========================================
   function setupEventListeners() {
+    // Drawer open/close
+    el.btnToggleDrawer.addEventListener('click', openDrawer);
+    el.drawerCloseBtn.addEventListener('click', closeDrawer);
+    el.drawerBackdrop.addEventListener('click', closeDrawer);
+
+    // Drawer Tabs
+    el.drawerTabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        switchDrawerTab(btn.dataset.tab);
+      });
+    });
+
+    // Save Start Date (İlişki Sayacı)
+    el.btnSaveStartDate.addEventListener('click', async () => {
+      const val = el.inputRelationshipStart.value;
+      if (!val) return;
+      state.settings.startDate = val;
+      await window.memoryDB.saveSettings(state.settings);
+      startElapsedTimer();
+      el.btnSaveStartDate.textContent = 'Kaydedildi!';
+      setTimeout(() => { el.btnSaveStartDate.textContent = 'Kaydet'; }, 1500);
+    });
+
+    // Preset Special Day Change
+    el.selectSpecialEvent.addEventListener('change', (e) => {
+      handlePresetEventChange(e.target.value);
+    });
+
+    // Save Target Date (Geri Sayım)
+    el.btnSaveTargetDate.addEventListener('click', async () => {
+      const title = el.inputTargetTitle.value.trim() || 'Özel Gün';
+      const dateVal = el.inputTargetDate.value;
+      if (!dateVal) return;
+
+      state.settings.targetTitle = title;
+      state.settings.targetDate = dateVal;
+      state.settings.specialEventKey = el.selectSpecialEvent.value;
+
+      el.displayTargetName.textContent = title;
+      await window.memoryDB.saveSettings(state.settings);
+      startCountdownTimer();
+
+      el.btnSaveTargetDate.textContent = 'Uygulandı!';
+      setTimeout(() => { el.btnSaveTargetDate.textContent = 'Uygula'; }, 1500);
+    });
+
+    // Modal Triggers
     el.btnUploadTrigger.addEventListener('click', () => openModal(el.uploadModal));
     el.btnGalleryManager.addEventListener('click', openGalleryManager);
     el.btnGalleryAddMore.addEventListener('click', () => {
@@ -295,9 +542,10 @@ document.addEventListener('DOMContentLoaded', async () => {
       }
     });
 
-    // Escape closes modals
+    // Escape closes everything
     window.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') {
+        closeDrawer();
         closeLightbox();
         closeModal(el.uploadModal);
         closeModal(el.galleryModal);

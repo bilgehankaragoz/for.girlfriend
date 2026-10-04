@@ -205,7 +205,22 @@ class MemoryDB {
   }
 
   async getSettings() {
-    const defaultSettings = { speed: 'normal' };
+    const oneYearAgo = new Date();
+    oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+    oneYearAgo.setHours(0, 0, 0, 0);
+
+    const nextEvent = new Date();
+    nextEvent.setMonth(nextEvent.getMonth() + 2);
+    nextEvent.setHours(0, 0, 0, 0);
+
+    const defaultSettings = {
+      speed: 'normal',
+      startDate: oneYearAgo.toISOString().substring(0, 16),
+      targetTitle: 'Yıldönümümüz',
+      targetDate: nextEvent.toISOString().substring(0, 16),
+      specialEventKey: 'anniversary'
+    };
+
     if (!this.db) {
       const local = localStorage.getItem('gf_settings');
       if (local) {
