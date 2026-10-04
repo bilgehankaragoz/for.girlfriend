@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sonsuz Anılarımız ✨ | For My Girlfriend</title>
+  <meta name="description" content="En güzel anılarımızın bir arada aktığı, sonsuz dikey kolaj ve aşk hatırası web sitesi.">
+  
+  <!-- Google Fonts: Playfair Display, Plus Jakarta Sans & Dancing Script -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Main Stylesheet -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="filter-romantic">
+
+  <!-- ==============================================
+       BACKGROUND: Dikey Kayan Kolaj Bantları (Vertical Bands)
+       ============================================== -->
+  <div id="collage-canvas" class="collage-canvas" aria-hidden="true">
+    <!-- Kolonlar JS tarafından dinamik oluşturulacaktır -->
+  </div>
+
+  <!-- Soft Romantic Ambient Vignette & Gradient Overlays -->
+  <div class="ambient-overlay"></div>
+  <div class="ambient-glow glow-1"></div>
+  <div class="ambient-glow glow-2"></div>
+  <div class="particles-container" id="particles-container"></div>
+
+  <!-- ==============================================
+       HEADER / FLOATING TOP CONTROLS
+       ============================================== -->
+  <header class="top-nav">
+    <div class="logo-area">
+      <div class="heart-pulse-icon">
+        <i class="fa-solid fa-heart"></i>
+      </div>
+      <div class="logo-text">
+        <span class="logo-title" id="nav-couple-names">Bizim Hikayemiz</span>
+        <span class="logo-subtitle">Sonsuz Fotoğraf Kolajı</span>
+      </div>
+    </div>
+
+    <!-- Quick Floating Action Toolbar -->
+    <div class="quick-toolbar">
+      <button id="btn-toggle-music" class="action-pill-btn music-btn" title="Romantik Melodi Çal/Durdur" aria-label="Müzik">
+        <i class="fa-solid fa-music"></i>
+        <span class="btn-text">Melodi</span>
+        <span class="music-wave-bars">
+          <span></span><span></span><span></span>
+        </span>
+      </button>
+
+      <button id="btn-upload-trigger" class="action-pill-btn primary" title="Yeni Fotoğraf Ekle" aria-label="Fotoğraf Ekle">
+        <i class="fa-solid fa-camera-retro"></i>
+        <span class="btn-text">Fotoğraf Ekle</span>
+      </button>
+
+      <button id="btn-gallery-manager" class="action-pill-btn" title="Fotoğrafları Yönet / Galeri" aria-label="Galeri">
+        <i class="fa-solid fa-images"></i>
+        <span class="btn-text">Galeri (<span id="photo-count-badge">0</span>)</span>
+      </button>
+
+      <button id="btn-open-settings" class="action-pill-btn icon-only" title="Özelleştirme ve Ayarlar" aria-label="Ayarlar">
+        <i class="fa-solid fa-gear"></i>
+      </button>
+
+      <button id="btn-toggle-focus" class="action-pill-btn icon-only" title="Odak / Tam Ekran Kolaj Modu (Göz Modu)" aria-label="Odak Modu">
+        <i class="fa-solid fa-expand"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- ==============================================
+       MAIN FOREGROUND: Romantic Hero Center Card
+       ============================================== -->
+  <main id="main-content" class="main-container">
+    <div class="romantic-glass-card" id="hero-card">
+      <div class="card-ornament top-ornament">
+        <i class="fa-solid fa-sparkles"></i>
+        <span class="special-badge">Aşkımızın Zaman Tüneli</span>
+        <i class="fa-solid fa-sparkles"></i>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="names" id="display-couple-names">Sen & Ben</span>
+        <span class="script-subtitle" id="display-romantic-quote">"Seninle geçen her saniye, ömrüme değer bir hatıra..."</span>
+      </h1>
+
+      <!-- Anniversary Love Counter -->
+      <div class="counter-box" id="counter-box">
+        <div class="counter-title">
+          <i class="fa-solid fa-infinity"></i>
+          <span>Birlikte Geçen Zamanımız</span>
+        </div>
+        <div class="timer-grid">
+          <div class="timer-unit">
+            <span class="timer-num" id="time-days">0</span>
+            <span class="timer-label">Gün</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-unit">
+            <span class="timer-num" id="time-hours">00</span>
+            <span class="timer-label">Saat</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-unit">
+            <span class="timer-num" id="time-minutes">00</span>
+            <span class="timer-label">Dakika</span>
+          </div>
+          <div class="timer-separator">:</div>
+          <div class="timer-unit">
+            <span class="timer-num" id="time-seconds">00</span>
+            <span class="timer-label">Saniye</span>
+          </div>
+        </div>
+        <div class="counter-date-text">
+          Başlangıç: <strong id="display-start-date">01 Ocak 2024</strong>
+        </div>
+      </div>
+
+      <!-- Action Buttons in Hero -->
+      <div class="card-actions">
+        <button id="btn-open-letter" class="hero-btn secondary">
+          <i class="fa-solid fa-envelope-open-heart"></i>
+          <span>Sana Özel Mektup</span>
+        </button>
+
+        <button id="btn-quick-upload" class="hero-btn primary">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+          <span>Anı Fotoğraflarımızı Yükle</span>
+        </button>
+      </div>
+
+      <!-- Bottom Floating Controls: Speed & Filter -->
+      <div class="card-footer-controls">
+        <div class="control-group">
+          <label><i class="fa-solid fa-gauge-high"></i> Akış Hızı:</label>
+          <div class="speed-selector">
+            <button class="speed-chip" data-speed="slow">Yavaş</button>
+            <button class="speed-chip active" data-speed="normal">Normal</button>
+            <button class="speed-chip" data-speed="fast">Hızlı</button>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label><i class="fa-solid fa-wand-magic-sparkles"></i> Renk Modu:</label>
+          <select id="filter-dropdown" class="filter-select">
+            <option value="romantic">Gül Kurusu & Romantik</option>
+            <option value="warm">Sıcak & Altın Güneş</option>
+            <option value="vintage">Nostaljik Vintage</option>
+            <option value="dreamy">Masalsı Yumuşak Glow</option>
+            <option value="monochrome">Klasik Siyah & Beyaz</option>
+            <option value="natural">Orijinal Renkler</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Focus Mode Exit Pill (Shown only when in Zen / Focus Mode) -->
+  <button id="btn-exit-focus" class="exit-focus-pill" aria-label="Odak Modundan Çık">
+    <i class="fa-solid fa-compress"></i>
+    <span>Kartı ve Kontrolleri Göster</span>
+  </button>
+
+  <!-- ==============================================
+       MODAL: FOTOĞRAF YÜKLEME (Drag & Drop + URL + File Picker)
+       ============================================== -->
+  <div class="modal-backdrop" id="upload-modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-heart-circle-plus"></i>
+          <h3>Yeni Anı Fotoğrafları Ekle</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="upload-modal" aria-label="Kapat">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <p class="modal-desc">
+          Birlikte çekildiğiniz fotoğrafları sürükleyip bırakın veya seçin. Fotoğraflar otomatik olarak dikey kayan kolaj bantlarına eklenecektir.
+        </p>
+
+        <!-- Drop Zone -->
+        <div class="drop-zone" id="drop-zone">
+          <input type="file" id="file-input" multiple accept="image/*" class="file-input-hidden">
+          <div class="drop-zone-icon">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+          </div>
+          <div class="drop-zone-text">
+            <strong>Fotoğrafları buraya sürükleyin</strong>
+            <span>veya bilgisayarınızdan seçmek için <em>tıklayın</em></span>
+          </div>
+          <span class="file-hints">JPG, PNG, WEBP, GIF desteklenir • Çoklu seçim yapabilirsiniz</span>
+        </div>
+
+        <!-- Optional URL Upload -->
+        <div class="url-upload-row">
+          <div class="input-with-icon">
+            <i class="fa-solid fa-link"></i>
+            <input type="url" id="image-url-input" placeholder="Veya bir fotoğraf bağlantısı (URL) yapıştırın...">
+          </div>
+          <button id="btn-add-url" class="btn-secondary-sm">Ekle</button>
+        </div>
+
+        <!-- Uploaded Queue Preview -->
+        <div id="upload-queue-container" class="upload-queue-container hidden">
+          <h4>Yüklenecek Fotoğraflar (<span id="queue-count">0</span>)</h4>
+          <div class="upload-queue-grid" id="upload-queue-grid"></div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" data-close-modal="upload-modal">Vazgeç</button>
+        <button id="btn-confirm-upload" class="btn-primary" disabled>
+          <i class="fa-solid fa-check"></i>
+          <span>Kolaja Ekle</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL: FOTOĞRAF GALERİSİ & YÖNETİM
+       ============================================== -->
+  <div class="modal-backdrop" id="gallery-modal" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-images"></i>
+          <h3>Kolajdaki Fotoğraflar</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="gallery-modal" aria-label="Kapat">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="gallery-toolbar">
+          <span>Toplam <strong id="gallery-total-count">0</strong> fotoğraf kolajda dönüyor</span>
+          <div class="gallery-actions">
+            <button id="btn-gallery-add-more" class="btn-secondary-sm">
+              <i class="fa-solid fa-plus"></i> Fotoğraf Ekle
+            </button>
+            <button id="btn-reset-default-photos" class="btn-secondary-sm danger" title="Varsayılan romantik fotoğraflara dön">
+              <i class="fa-solid fa-rotate-left"></i> Sıfırla
+            </button>
+          </div>
+        </div>
+
+        <div class="gallery-cards-grid" id="gallery-cards-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-primary" data-close-modal="gallery-modal">Tamam</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL: MEKTUP / ROMANTİK NOT
+       ============================================== -->
+  <div class="modal-backdrop" id="letter-modal" aria-hidden="true">
+    <div class="modal-dialog modal-letter">
+      <div class="letter-paper">
+        <button class="modal-close-btn letter-close" data-close-modal="letter-modal" aria-label="Kapat">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+        <div class="letter-stamp">
+          <i class="fa-solid fa-heart"></i>
+        </div>
+        <div class="letter-header">
+          <h2 class="letter-heading" id="letter-title">Canım Sevgilime...</h2>
+          <div class="letter-date" id="letter-date-display">Bugün ve her zaman</div>
+        </div>
+        <div class="letter-content" id="letter-body">
+          <p>Hayatıma girdiğin andan itibaren her günüm bir masalın en tatlı sayfasına dönüştü.</p>
+          <p>Arka planda dikey bir şerit gibi akan her bir fotoğraf, seninle geçirdiğim en kıymetli anların birer yankısı. İyi ki varsın, iyi ki yanımdasın.</p>
+          <p class="letter-signature" id="letter-signature-display">Seni Çok Seven Biri ❤️</p>
+        </div>
+        <div class="letter-actions">
+          <button id="btn-edit-letter" class="btn-secondary-sm">
+            <i class="fa-solid fa-feather-pointed"></i> Mektubu Düzenle
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       MODAL: AYARLAR (İsimler, Tarih, Müzik, Mektup)
+       ============================================== -->
+  <div class="modal-backdrop" id="settings-modal" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <i class="fa-solid fa-sliders"></i>
+          <h3>Sayfayı Özelleştir</h3>
+        </div>
+        <button class="modal-close-btn" data-close-modal="settings-modal" aria-label="Kapat">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form id="settings-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="input-partner-name">1. İsim (Senin Adın)</label>
+              <input type="text" id="input-partner-name" placeholder="Örn: Bilgehan" required>
+            </div>
+            <div class="form-group">
+              <label for="input-girlfriend-name">2. İsim (Sevgilinin Adı)</label>
+              <input type="text" id="input-girlfriend-name" placeholder="Örn: Sevgilim" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="input-anniversary-date">Yıldönümü / Başlangıç Tarihi</label>
+            <input type="datetime-local" id="input-anniversary-date" required>
+            <small class="form-tip">Geçen zaman sayacı bu tarihten itibaren hesaplanır.</small>
+          </div>
+
+          <div class="form-group">
+            <label for="input-custom-quote">Romantik Başlık / Alıntı</label>
+            <input type="text" id="input-custom-quote" placeholder="Seninle geçen her saniye ömrüme değer...">
+          </div>
+
+          <div class="form-group">
+            <label for="input-letter-text">Özel Mektup Metni</label>
+            <textarea id="input-letter-text" rows="4" placeholder="Ona söylemek istediğin en güzel cümleler..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="input-letter-signature">Mektup İmzası</label>
+            <input type="text" id="input-letter-signature" placeholder="Sonsuza Dek Senin, Bilgehan">
+          </div>
+        </form>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-cancel" data-close-modal="settings-modal">İptal</button>
+        <button id="btn-save-settings" class="btn-primary">
+          <i class="fa-solid fa-floppy-disk"></i>
+          <span>Kaydet ve Uygula</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==============================================
+       LIGHTBOX: Büyütülmüş Fotoğraf Görüntüleyici
+       ============================================== -->
+  <div class="lightbox-backdrop" id="lightbox-modal" aria-hidden="true">
+    <button class="lightbox-close" id="lightbox-close-btn" aria-label="Kapat">
+      <i class="fa-solid fa-xmark"></i>
+    </button>
+    <div class="lightbox-content">
+      <div class="lightbox-frame">
+        <img id="lightbox-img" src="" alt="Büyütülmüş Anı">
+        <div class="lightbox-caption">
+          <span class="caption-date" id="lightbox-date">Anılarımızdan bir kare</span>
+          <button class="lightbox-heart-btn" id="lightbox-heart-btn" title="Kalp Bırak">
+            <i class="fa-solid fa-heart"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="js/db.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/collage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
