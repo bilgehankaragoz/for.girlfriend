@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Eda & Bilgehan | Bizim Hikayemiz</title>
   
-  <!-- Google Fonts: Playfair Display (Zarif Başlıklar) & Plus Jakarta Sans (Modern Arayüz) -->
+  <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -14,11 +14,10 @@
 </head>
 <body>
 
-  <!-- Arka Plan Slideshow Katmanı (bg1.jpg, bg2.jpg, bg3.jpg) -->
+  <!-- Arka Plan Slideshow Katmanı (Vercel Blob Cloud Photos) -->
   <div id="slideshow-container" class="slideshow-container" aria-hidden="true">
-    <div class="slide slide-active" style="background-image: url('bg1.jpg');"></div>
-    <div class="slide" style="background-image: url('bg2.jpg');"></div>
-    <div class="slide" style="background-image: url('bg3.jpg');"></div>
+    <div id="slide-layer-1" class="slide slide-active"></div>
+    <div id="slide-layer-2" class="slide"></div>
     <div class="slideshow-overlay"></div>
   </div>
 
@@ -43,7 +42,7 @@
             </div>
             <div class="btn-text-content">
               <span class="btn-label">İlişki Sayacı</span>
-              <span class="btn-subtext">24 Kasım 2024'ten bugüne</span>
+              <span class="btn-subtext">24 Kasım 2024'ten bugüne geçen süre</span>
             </div>
             <div class="btn-arrow">→</div>
           </button>
@@ -59,10 +58,18 @@
             <div class="btn-arrow">→</div>
           </button>
         </div>
+
+        <!-- Zarif Yönetici Giriş Linki -->
+        <div class="admin-discreet-access">
+          <button id="btn-open-admin" class="discreet-link-btn" type="button" title="Yönetici Paneli">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Yönetici Girişi</span>
+          </button>
+        </div>
       </div>
     </section>
 
-    <!-- SAYFA 2: İLİŞKİ SAYACI (COUNT-UP) -->
+    <!-- SAYFA 2: İLİŞKİ SAYACI (SABİT BAŞLANGIÇ: 24.11.2024) -->
     <section id="view-relationship" class="view-section">
       <nav class="nav-bar">
         <button class="glass-back-btn back-to-menu-btn" type="button">
@@ -126,7 +133,7 @@
 
         <h2 class="view-title">Heyecanla Beklenen Anlar</h2>
         
-        <!-- Özel Gün Seçim Barı / Dropdown -->
+        <!-- Özel Gün Seçim Barı -->
         <div class="selection-container">
           <label for="special-event-select" class="selection-label">Takip Edilecek Özel Günü Seçin:</label>
           <div class="custom-select-wrapper">
@@ -172,6 +179,88 @@
         <div id="countdown-status-msg" class="counter-footer-quote">
           <p>“Kavuştuğumuz her yeni gün aşkımızı daha da güzelleştiriyor.”</p>
         </div>
+      </div>
+    </section>
+
+    <!-- SAYFA 4: YÖNETİCİ / ADMIN PANELİ -->
+    <section id="view-admin" class="view-section">
+      <nav class="nav-bar">
+        <button class="glass-back-btn back-to-menu-btn" type="button">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <span>Siteye Dön</span>
+        </button>
+      </nav>
+
+      <!-- 1. Giriş Formu (Oturum Açılmamışsa) -->
+      <div id="admin-login-box" class="glass-card admin-card">
+        <div class="romantic-badge">
+          <span>🔒 Yönetici Doğrulaması</span>
+        </div>
+        <h2 class="view-title">Yönetici Girişi</h2>
+        <p class="view-description">Sitedeki fotoğraf ve anıları yalnızca siz yönetebilirsiniz.</p>
+
+        <form id="admin-login-form" class="admin-auth-form" onsubmit="return false;">
+          <div class="input-field-wrap">
+            <input type="password" id="admin-password-input" class="glass-text-input" placeholder="Yönetici Şifrenizi Girin..." autocomplete="current-password" required>
+          </div>
+          <button type="submit" id="btn-admin-login-submit" class="glass-submit-btn">
+            <span>Giriş Yap</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <p id="admin-login-error" class="error-text" style="display:none;"></p>
+        </form>
+      </div>
+
+      <!-- 2. Yönetici Paneli (Oturum Açıldıktan Sonra) -->
+      <div id="admin-dashboard-box" class="glass-card admin-dashboard" style="display: none;">
+        <div class="dashboard-header">
+          <div>
+            <div class="romantic-badge">
+              <span>☁️ Vercel Blob Deposu</span>
+            </div>
+            <h2 class="view-title" style="margin-bottom: 4px;">Fotoğraf Yönetim Paneli</h2>
+            <p class="view-description" style="margin-bottom: 0;">Buraya eklediğiniz tüm fotoğraflar Vercel bulutunda saklanır ve sevgiliniz dahil tüm cihazlarda canlı görünür.</p>
+          </div>
+          <button id="btn-admin-logout" class="glass-logout-btn" type="button" title="Oturumu Kapat">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Çıkış</span>
+          </button>
+        </div>
+
+        <!-- Yeni Fotoğraf Yükleme Alanı -->
+        <div class="admin-upload-zone" id="upload-dropzone">
+          <input type="file" id="admin-file-input" multiple accept="image/*" style="display: none;">
+          <div class="dropzone-content">
+            <div class="dropzone-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <h4>Fotoğrafları Sürükleyip Bırakın veya Seçin</h4>
+            <p>Sevgilinizle olan anı fotoğraflarınızı tek seferde veya tek tek Vercel Blob'a yükleyin</p>
+            <button type="button" class="btn-select-photos" onclick="document.getElementById('admin-file-input').click();">
+              Dosya Seç
+            </button>
+          </div>
+          <div id="upload-progress-container" class="upload-progress-box" style="display:none;">
+            <div class="progress-bar-wrap">
+              <div id="upload-progress-fill" class="progress-bar-fill"></div>
+            </div>
+            <span id="upload-status-text" class="progress-text">Yükleniyor...</span>
+          </div>
+        </div>
+
+        <!-- Yüklü Fotoğraflar Galerisi -->
+        <div class="admin-gallery-section">
+          <div class="gallery-section-head">
+            <h3>Yayındaki Fotoğraflar (<span id="gallery-count">0</span>)</h3>
+            <span class="gallery-hint">Herkesin göreceği arka plan slaytında bu fotoğraflar döner</span>
+          </div>
+
+          <div id="admin-photo-grid" class="admin-photo-grid">
+            <!-- Dinamik olarak JS ile dolar -->
+            <div class="gallery-loading">Fotoğraflar yükleniyor...</div>
+          </div>
+        </div>
+
       </div>
     </section>
 
